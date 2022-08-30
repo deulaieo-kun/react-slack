@@ -2,18 +2,30 @@ import React from "react";
 import styled from "styled-components";
 import { selectRoomId } from "../features/appSlice";
 import { useSelector } from "react-redux";
-import { useDocument } from "react-firebase-hooks/firestore";
+import { useCollection, useDocument } from "react-firebase-hooks/firestore";
 import { db } from "../firebase";
+import Message from "./Message";
 
 // Icons
 import StarBorderOutlinedIcon from "@mui/icons-material/StarBorderOutlined";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import ChatInput from "./ChatInput";
 
 export default function Chat() {
   const roomId = useSelector(selectRoomId);
   const [roomDetails] = useDocument(
     roomId && db.collection("rooms").doc(roomId)
   );
+
+  const [roomMessages, loading] = useCollection(
+    roomId &&
+      db
+        .collection("rooms")
+        .doc(roomId)
+        .collection("messages")
+        .orderBy("timestamp", "asc")
+  );
+
   return (
     <ChatContainer>
       <>
@@ -31,6 +43,23 @@ export default function Chat() {
             </p>
           </HeaderRight>
         </Header>
+
+        <ChatMessages>
+          {roomMessages?.docs.map((doc) => {
+            const { message, timestamp, user, userImage } = doc.data();
+            return (
+              <Message
+                key={doc.id}
+                message={message}
+                timestamp={timestamp}
+                user={user}
+                userImage={userImage}
+              />
+            );
+          })}
+        </ChatMessages>
+
+        <ChatInput channelName={roomDetails?.data().name} channelId={roomId} />
       </>
     </ChatContainer>
   );
@@ -78,3 +107,5 @@ const HeaderRight = styled.div`
     font-size: 16px;
   }
 `;
+
+const ChatMessages = styled.div``;

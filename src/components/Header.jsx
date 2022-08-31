@@ -6,14 +6,19 @@ import { Avatar } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import HelpIcon from "@mui/icons-material/Help";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "../firebase";
 
 export default function Header() {
+  const [user] = useAuthState(auth);
+
   return (
     <HeaderContainer>
       <HeaderLeft>
         <HeaderAvatar
-          alt="test image"
-          src="https://scontent.fcrk2-2.fna.fbcdn.net/v/t39.30808-6/293605373_5482333775122038_3053823897547301568_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=09cbfe&_nc_eui2=AeGKlDykIp1pjvdNIcZvIBbJrWrpzDk70DStaunMOTvQNPUDFtcy6l5oJkPx7o0DemCdKqKmpytKVo6oEe5V1jHY&_nc_ohc=epmd1-3dvJwAX9A7X4b&tn=qDiW-WIA7rYp5rcl&_nc_ht=scontent.fcrk2-2.fna&oh=00_AT_yxF6iODC3zoaIsSVYFW1VHm0cRTDz8UPe-K1rYsnslw&oe=630EFA78"
+          src={user?.photoURL}
+          alt={user?.displayName}
+          onClick={() => auth.signOut()}
         />
         <AccessTimeIcon />
       </HeaderLeft>
